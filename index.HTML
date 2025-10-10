@@ -3,74 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة العقارات والحسابات - النسخة الاحترافية</title>
+    <title>نظام إدارة العقارات والحسابات - النسخة النهائية</title>
     
     <style>
         /* ==================================== */
-        /* CSS للتنسيق والمظهر العام */
+        /* CSS: الألوان والتنسيق النهائي */
         /* ==================================== */
+        :root {
+            /* تعريف متغيرات الألوان لسهولة التغيير */
+            --primary-color: #007bff; /* أزرق أساسي */
+            --secondary-color: #6c757d; /* رمادي ثانوي */
+            --success-color: #28a745; /* أخضر للإيداع/النجاح */
+            --danger-color: #dc3545; /* أحمر للمصروف/الخطر */
+            --bg-light: #f8f9fa; /* خلفية فاتحة */
+            --text-dark: #343a40; /* نص داكن */
+        }
+        
         body { 
-            font-family: 'Arial', sans-serif; 
+            font-family: 'Tahoma', 'Arial', sans-serif; 
             margin: 0; 
             padding: 0; 
-            background-color: #f4f7f6;
-            color: #333;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
         }
         .container {
             max-width: 1200px;
             margin: 20px auto;
-            padding: 20px;
+            padding: 30px;
             background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 12px;
         }
         h1, h2, h3 { 
-            color: #007bff; 
-            border-bottom: 2px solid #eee;
+            color: var(--primary-color); 
+            border-bottom: 2px solid #e9ecef;
             padding-bottom: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         nav {
-            background-color: #007bff;
+            background-color: var(--primary-color);
             padding: 10px 0;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
         }
         nav a { 
             margin: 0 15px; 
             text-decoration: none; 
             color: white; 
             font-weight: bold;
-            padding: 5px 10px;
-            transition: background-color 0.3s;
+            padding: 8px 12px;
+            transition: background-color 0.3s, border-radius 0.3s;
         }
         nav a:hover, nav a.active-link {
             background-color: #0056b3;
-            border-radius: 5px;
+            border-radius: 6px;
         }
 
-        /* الجداول والتقارير */
+        /* الجداول */
         table { 
             width: 100%; 
             border-collapse: collapse; 
             margin-top: 20px; 
+            font-size: 14px;
         }
         th, td { 
-            border: 1px solid #ddd; 
+            border: 1px solid #dee2e6; 
             padding: 12px; 
             text-align: right; 
         }
         th { 
-            background-color: #e9ecef; 
-            color: #333;
+            background-color: var(--bg-light); 
+            color: var(--text-dark);
             font-weight: bold;
         }
         tr:nth-child(even) { background-color: #f8f9fa; }
-        .deposit { color: green; font-weight: bold; }
-        .expense { color: red; font-weight: bold; }
+        .deposit { color: var(--success-color); font-weight: bold; }
+        .expense { color: var(--danger-color); font-weight: bold; }
         .tab-content { display: none; padding-top: 20px; }
         .active { display: block; }
-
+        
         /* الملخص */
         #summary-data { display: flex; justify-content: space-between; gap: 20px; }
         #summary-data p {
@@ -78,45 +89,69 @@
             padding: 15px;
             border-radius: 5px;
             flex-grow: 1;
-            border-right: 5px solid #007bff;
+            border-right: 5px solid var(--primary-color);
+            white-space: nowrap;
         }
 
-        /* حقول الإدخال */
-        form label {
-            display: inline-block;
-            width: 150px;
-            margin-top: 10px;
+        /* الأزرار العامة */
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            color: white;
             font-weight: bold;
         }
-        form input, form select {
-            width: 70%;
+        .btn-edit { background-color: #ffc107; color: var(--text-dark); margin-right: 5px; }
+        .btn-edit:hover { background-color: #e0a800; }
+
+        /* النموذج المنبثق (Modal) */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 100; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: right;
+        }
+        .close {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-content label { display: inline-block; width: 120px; margin-top: 10px; }
+        .modal-content input, .modal-content select { 
+            width: 65%;
             padding: 8px;
             margin-top: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
         }
-        form button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s;
-        }
-        
-        .report-controls {
-            padding: 15px;
-            background-color: #f8f9fa;
-            border: 1px solid #eee;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .report-controls button {
-             background-color: #17a2b8;
-        }
+
     </style>
 </head>
 <body>
@@ -139,8 +174,7 @@
             <p><strong>صافي الدخل (الرصيد):</strong> <span id="net-income">0.00</span> ريال</p>
         </div>
         <h3 style="margin-top: 40px;">ملاحظات هامة</h3>
-        <p>🔴 **تذكير:** البيانات مخزنة محلياً في متصفحك. استخدم نفس المتصفح والجهاز لتجنب ضياعها. 
-            للتخزين السحابي، يجب استخدام قاعدة بيانات مثل Firebase.</p>
+        <p>🔴 **تذكير:** البيانات مخزنة محلياً في متصفحك. استخدم نفس المتصفح والجهاز لتجنب ضياعها. يرجى **عدم** استخدام وضع التصفح الخفي (Incognito Mode).</p>
     </section>
 
     <section id="transactions" class="tab-content">
@@ -176,7 +210,7 @@
             <label for="dep-desc">ملاحظات/الشهر:</label>
             <input type="text" id="dep-desc" placeholder="مثال: إيجار شهر أكتوبر 2025"><br>
 
-            <button type="submit">تسجيل الإيداع</button>
+            <button type="submit" style="background-color: var(--success-color);">تسجيل الإيداع</button>
         </form>
 
         <hr style="margin: 30px 0;">
@@ -200,7 +234,7 @@
             <label for="exp-desc">الوصف:</label>
             <input type="text" id="exp-desc" required placeholder="مثال: فاتورة كهرباء الفيلا"><br>
 
-            <button type="submit">تسجيل المصروف</button>
+            <button type="submit" style="background-color: var(--danger-color);">تسجيل المصروف</button>
         </form>
     </section>
 
@@ -217,10 +251,11 @@
                     <th>الإيداع (+)</th>
                     <th>المصروف (-)</th>
                     <th>الرصيد</th>
+                    <th>إجراء</th>
                 </tr>
             </thead>
             <tbody id="transactions-table-body">
-                <tr><td colspan="8" style="text-align: center;">لا توجد حركات مسجلة بعد.</td></tr>
+                <tr><td colspan="9" style="text-align: center;">لا توجد حركات مسجلة بعد.</td></tr>
             </tbody>
         </table>
     </section>
@@ -245,28 +280,51 @@
                 </select>
             </div>
             
-            <button onclick="generateReport()" style="margin-right: 20px;">توليد التقرير</button>
-            <button onclick="printReport()" style="background-color: #6c757d;">طباعة التقرير</button>
+            <button onclick="generateReport()" style="margin-right: 20px; background-color: #17a2b8;">توليد التقرير</button>
+            <button onclick="printReport()" style="background-color: var(--secondary-color);">طباعة التقرير</button>
         </div>
 
         <h3 id="report-title">نتائج التقرير</h3>
         <div id="report-output">
-            <p style="color: #6c757d;">اختر نوع التقرير واضغط "توليد التقرير" لعرض البيانات.</p>
+            <p style="color: var(--secondary-color);">اختر نوع التقرير واضغط "توليد التقرير" لعرض البيانات.</p>
         </div>
     </section>
 
-</div> <script>
-    // 1. تعريف خريطة العقارات والشقق (بناءً على التعديل الجديد)
+</div> <div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>تعديل العملية المالية</h2>
+        <form id="edit-form">
+            <input type="hidden" id="edit-id">
+
+            <label for="edit-date">التاريخ:</label>
+            <input type="date" id="edit-date" required><br>
+
+            <label for="edit-amount">المبلغ (موجب للإيداع، سالب للمصروف):</label>
+            <input type="number" id="edit-amount" required><br>
+
+            <label for="edit-desc">الوصف/الملاحظات:</label>
+            <input type="text" id="edit-desc" required><br>
+            
+            <button type="submit" style="background-color: var(--primary-color);">حفظ التعديلات</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // 1. تعريف خريطة العقارات والشقق
     const unitsMap = {
-        // شقق 1-6 (المبنى الرئيسي) + شقق 7-14 (الفيلا) = 14 شقة
         "الفيلا والمبنى الرئيسي": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],    
-        "المجلس 101": [15, 16, 17, 18, 19, 20, 21], // 7 شقق
-        "المجلس 102": [22, 23, 24, 25] // 4 شقق
+        "المجلس 101": [15, 16, 17, 18, 19, 20, 21], 
+        "المجلس 102": [22, 23, 24, 25] 
     };
 
     let transactions = []; 
 
-    // 2. وظيفة التبديل بين الأقسام
+    // ===================================
+    // وظائف دعم النظام الأساسية
+    // ===================================
+
     function showTab(tabId, element) {
         document.querySelectorAll('.tab-content').forEach(tab => {
             tab.classList.remove('active');
@@ -289,7 +347,6 @@
         }
     }
 
-    // 3. وظيفة تعبئة قائمة الشقق بناءً على اختيار العقار
     function populateUnits() {
         const buildingSelect = document.getElementById('dep-building');
         const unitSelect = document.getElementById('dep-unit');
@@ -311,67 +368,23 @@
             unitSelect.disabled = true;
         }
     }
+    
+    // ===================================
+    // وظائف التخزين والحساب
+    // ===================================
 
-    // 4. تحميل البيانات وحفظها (Local Storage)
     function loadTransactions() {
         const storedTransactions = localStorage.getItem('hesabatTransactions');
         if (storedTransactions) {
             transactions = JSON.parse(storedTransactions);
         }
         updateSummary();
-        renderTransactions(); 
     }
 
     function saveTransactions() {
         localStorage.setItem('hesabatTransactions', JSON.stringify(transactions));
     }
 
-    // 5. معالجة إدخال الإيداع (مع إضافة طريقة الدفع)
-    document.getElementById('deposit-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const newTransaction = {
-            date: document.getElementById('dep-date').value,
-            type: 'إيداع',
-            amount: parseFloat(document.getElementById('dep-amount').value),
-            paymentMethod: document.getElementById('dep-payment-method').value, // جديد
-            building: document.getElementById('dep-building').value,
-            unit: document.getElementById('dep-unit').value,
-            description: document.getElementById('dep-desc').value || 'إيجار مدفوع',
-        };
-
-        transactions.push(newTransaction);
-        saveTransactions();
-        updateSummary();
-        renderTransactions();
-        this.reset();
-        alert('✅ تم تسجيل الإيداع بنجاح!');
-        document.getElementById('dep-unit').disabled = true;
-    });
-
-    // 6. معالجة إدخال المصروف
-    document.getElementById('expense-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const newTransaction = {
-            date: document.getElementById('exp-date').value,
-            type: 'مصروف',
-            amount: parseFloat(document.getElementById('exp-amount').value) * -1, 
-            paymentMethod: 'نقدي/غير محدد', // يمكن تعديلها إذا أردت تتبع طريقة دفع المصروفات
-            building: 'غير محدد',
-            unit: document.getElementById('exp-type').value, 
-            description: document.getElementById('exp-desc').value,
-        };
-
-        transactions.push(newTransaction);
-        saveTransactions();
-        updateSummary();
-        renderTransactions();
-        this.reset();
-        alert('✅ تم تسجيل المصروف بنجاح!');
-    });
-
-    // 7. تحديث ملخص الأداء المالي
     function updateSummary() {
         let totalDeposits = 0;
         let totalExpenses = 0;
@@ -385,61 +398,193 @@
             }
             netIncome += t.amount;
         });
-
+        
         document.getElementById('total-deposits').textContent = totalDeposits.toFixed(2).toLocaleString('en');
         document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2).toLocaleString('en');
         document.getElementById('net-income').textContent = netIncome.toFixed(2).toLocaleString('en');
         
         const netIncomeElement = document.getElementById('net-income');
-        netIncomeElement.style.color = netIncome >= 0 ? 'green' : 'red';
+        // استخدام getComputedStyle للوصول لمتغيرات CSS
+        const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
+        const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color');
+
+        netIncomeElement.style.color = netIncome >= 0 ? successColor : dangerColor;
+    }
+
+    // ===================================
+    // معالجة النماذج
+    // ===================================
+
+    // معالجة إدخال الإيداع
+    document.getElementById('deposit-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const newTransaction = {
+            date: document.getElementById('dep-date').value,
+            type: 'إيداع',
+            amount: parseFloat(document.getElementById('dep-amount').value),
+            paymentMethod: document.getElementById('dep-payment-method').value, 
+            building: document.getElementById('dep-building').value,
+            unit: document.getElementById('dep-unit').value,
+            description: document.getElementById('dep-desc').value || 'إيجار مدفوع',
+            id: Date.now() 
+        };
+
+        transactions.push(newTransaction);
+        saveTransactions();
+        updateSummary();
+        this.reset();
+        alert('✅ تم تسجيل الإيداع بنجاح!');
+        document.getElementById('dep-unit').disabled = true; 
+    });
+
+    // معالجة إدخال المصروف
+    document.getElementById('expense-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const newTransaction = {
+            date: document.getElementById('exp-date').value,
+            type: 'مصروف',
+            amount: parseFloat(document.getElementById('exp-amount').value) * -1, 
+            paymentMethod: 'نقدي/غير محدد', 
+            building: 'مصروفات',
+            unit: document.getElementById('exp-type').value, 
+            description: document.getElementById('exp-desc').value,
+            id: Date.now()
+        };
+
+        transactions.push(newTransaction);
+        saveTransactions();
+        updateSummary();
+        this.reset();
+        alert('✅ تم تسجيل المصروف بنجاح!');
+    });
+
+    // ===================================
+    // وظائف التعديل (Editing)
+    // ===================================
+    
+    function openModal(id) {
+        const transaction = transactions.find(t => t.id === id);
+        if (!transaction) return;
+
+        // تعبئة النموذج المنبثق
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-date').value = transaction.date;
+        document.getElementById('edit-amount').value = transaction.amount; 
+        document.getElementById('edit-desc').value = transaction.description;
+
+        document.getElementById('editModal').style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById('editModal').style.display = "none";
+    }
+
+    document.getElementById('edit-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const idToEdit = parseFloat(document.getElementById('edit-id').value);
+        const newDate = document.getElementById('edit-date').value;
+        const newAmount = parseFloat(document.getElementById('edit-amount').value);
+        const newDesc = document.getElementById('edit-desc').value;
+
+        const transactionIndex = transactions.findIndex(t => t.id === idToEdit);
+
+        if (transactionIndex > -1) {
+            const originalType = transactions[transactionIndex].type;
+            
+            // تحديث البيانات
+            transactions[transactionIndex].date = newDate;
+            transactions[transactionIndex].amount = newAmount; 
+            transactions[transactionIndex].description = newDesc;
+            
+            // تحديث نوع العملية إذا تغيرت الإشارة
+            if (originalType === 'إيداع' && newAmount < 0) {
+                 transactions[transactionIndex].type = 'مصروف';
+                 transactions[transactionIndex].building = 'مصروفات';
+            } else if (originalType === 'مصروف' && newAmount > 0) {
+                 transactions[transactionIndex].type = 'إيداع';
+                 // إذا كان التعديل من مصروف إلى إيداع، يجب مراجعة المبنى والوحدة يدويا!
+                 transactions[transactionIndex].building = 'تحتاج مراجعة (إيداع)'; 
+            }
+
+            saveTransactions();
+            updateSummary();
+            renderTransactions();
+            closeModal();
+            alert('✅ تم تعديل العملية بنجاح! يرجى مراجعة تفاصيل المبنى/الوحدة إذا تم تغيير نوع العملية جذرياً.');
+        } else {
+            alert('⚠️ لم يتم العثور على العملية للتعديل.');
+        }
+    });
+
+    // إغلاق المودال عند الضغط خارجها
+    window.onclick = function(event) {
+        const modal = document.getElementById('editModal');
+        if (event.target == modal) {
+            closeModal();
+        }
     }
 
 
-    // 8. عرض كشف الحركة المالية التفصيلي (مع إضافة عمود طريقة الدفع)
+    // ===================================
+    // عرض كشف الحركة المالية (مصمم للتحديث)
+    // ===================================
+
     function renderTransactions() {
         const tableBody = document.getElementById('transactions-table-body');
         tableBody.innerHTML = ''; 
 
         if (transactions.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">لا توجد حركات مسجلة بعد.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">لا توجد حركات مسجلة بعد.</td></tr>';
             return;
         }
 
-        const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+        // 1. فرز حسب التاريخ (الأقدم أولاً) لحساب الرصيد المتراكم بشكل صحيح
+        const sortedTransactions = [...transactions].sort((a, b) => {
+            if (a.date < b.date) return -1;
+            if (a.date > b.date) return 1;
+            return a.id - b.id; 
+        });
         
         let runningBalance = 0;
+        let rowsHtml = [];
+        
+        // 2. حساب الرصيد المتراكم وإنشاء صفوف الجدول
+        const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
+        const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color');
 
-        // عكس الترتيب للعرض (الأحدث أولاً)
-        for (let i = sortedTransactions.length - 1; i >= 0; i--) {
-            const t = sortedTransactions[i];
-            
-            // نحتاج لحساب الرصيد بترتيب تاريخي صحيح
-            let tempRunningBalance = 0;
-            for(let j=0; j<=i; j++) {
-                tempRunningBalance += sortedTransactions[j].amount;
-            }
-            runningBalance = tempRunningBalance;
+        sortedTransactions.forEach(t => {
+            runningBalance += t.amount;
 
-            const row = tableBody.insertRow(0); // إدراج الصف في البداية ليكون الأحدث هو الأعلى
-            
             const depositValue = t.amount > 0 ? t.amount.toFixed(2).toLocaleString('en') : '-';
             const expenseValue = t.amount < 0 ? Math.abs(t.amount).toFixed(2).toLocaleString('en') : '-';
             const unitDisplay = t.type === 'إيداع' ? `شقة ${t.unit}` : t.unit;
-
-            row.innerHTML = `
-                <td>${t.date}</td>
-                <td>${t.type}</td>
-                <td>${t.building}</td>
-                <td>${unitDisplay} / ${t.description}</td>
-                <td>${t.paymentMethod || '-'}</td>
-                <td class="${t.amount > 0 ? 'deposit' : ''}">${depositValue}</td>
-                <td class="${t.amount < 0 ? 'expense' : ''}">${expenseValue}</td>
-                <td>${runningBalance.toFixed(2).toLocaleString('en')}</td>
-            `;
-        }
+            
+            rowsHtml.push(`
+                <tr>
+                    <td>${t.date}</td>
+                    <td>${t.type}</td>
+                    <td>${t.building}</td>
+                    <td>${unitDisplay} / ${t.description}</td>
+                    <td>${t.paymentMethod || '-'}</td>
+                    <td class="${t.amount > 0 ? 'deposit' : ''}">${depositValue}</td>
+                    <td class="${t.amount < 0 ? 'expense' : ''}">${expenseValue}</td>
+                    <td style="font-weight: bold; color: ${runningBalance >= 0 ? successColor : dangerColor};">${runningBalance.toFixed(2).toLocaleString('en')}</td>
+                    <td><button class="btn-edit" onclick="openModal(${t.id})">تعديل</button></td>
+                </tr>
+            `);
+        });
+        
+        // 3. عكس ترتيب الصفوف المعروضة ليكون الأحدث هو الأعلى
+        tableBody.innerHTML = rowsHtml.reverse().join('');
     }
 
-    // 9. وظائف التقارير الاحترافية الجديدة
+    // ===================================
+    // وظائف التقارير (كما هي)
+    // ===================================
+
     function toggleReportFilters() {
         const type = document.getElementById('report-type').value;
         document.getElementById('filter-building').style.display = type === 'building' ? 'block' : 'none';
@@ -469,7 +614,7 @@
     function generateAnnualReport() {
         const monthlyData = {};
         transactions.forEach(t => {
-            const monthYear = t.date.substring(0, 7); // YYYY-MM
+            const monthYear = t.date.substring(0, 7); 
             if (!monthlyData[monthYear]) {
                 monthlyData[monthYear] = { deposits: 0, expenses: 0, net: 0 };
             }
@@ -481,9 +626,11 @@
             monthlyData[monthYear].net += t.amount;
         });
 
+        const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
+        const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color');
+
         let html = '<table><thead><tr><th>الشهر/السنة</th><th>الإيرادات</th><th>المصروفات</th><th>صافي الدخل</th></tr></thead><tbody>';
         
-        // فرز حسب التاريخ
         const sortedMonths = Object.keys(monthlyData).sort();
 
         sortedMonths.forEach(month => {
@@ -493,7 +640,7 @@
                     <td>${month}</td>
                     <td>${data.deposits.toFixed(2).toLocaleString('en')}</td>
                     <td>${data.expenses.toFixed(2).toLocaleString('en')}</td>
-                    <td style="color: ${data.net >= 0 ? 'green' : 'red'}; font-weight: bold;">${data.net.toFixed(2).toLocaleString('en')}</td>
+                    <td style="color: ${data.net >= 0 ? successColor : dangerColor}; font-weight: bold;">${data.net.toFixed(2).toLocaleString('en')}</td>
                 </tr>
             `;
         });
@@ -516,10 +663,13 @@
             else totalExpenses += Math.abs(t.amount);
         });
 
+        const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
+        const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color');
+
         let html = `
-            <p><strong>الإجمالي الكلي:</strong> ${totalDeposits - totalExpenses.toFixed(2).toLocaleString('en')} ريال</p>
-            <p style="color: green;">إجمالي الإيداعات: ${totalDeposits.toFixed(2).toLocaleString('en')} ريال</p>
-            <p style="color: red;">إجمالي المصروفات: ${totalExpenses.toFixed(2).toLocaleString('en')} ريال</p>
+            <p><strong>صافي الدخل لهذا العقار:</strong> ${(totalDeposits - totalExpenses).toFixed(2).toLocaleString('en')} ريال</p>
+            <p style="color: ${successColor};">إجمالي الإيداعات: ${totalDeposits.toFixed(2).toLocaleString('en')} ريال</p>
+            <p style="color: ${dangerColor};">إجمالي المصروفات: ${totalExpenses.toFixed(2).toLocaleString('en')} ريال</p>
         `;
 
         if (building !== 'الكل') {
@@ -549,7 +699,6 @@
         return html;
     }
     
-    // 10. وظيفة الطباعة
     function printReport() {
         const reportContent = document.getElementById('report-output').innerHTML;
         const title = document.getElementById('report-title').textContent;
