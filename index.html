@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة العقارات والحسابات - النسخة النهائية</title>
+    <title>نظام إدارة العقارات والحسابات - النسخة النهائية + الحذف</title>
     
     <style>
         /* ==================================== */
         /* CSS: الألوان والتنسيق النهائي */
         /* ==================================== */
         :root {
-            /* تعريف متغيرات الألوان لسهولة التغيير */
-            --primary-color: #007bff; /* أزرق أساسي */
-            --secondary-color: #6c757d; /* رمادي ثانوي */
-            --success-color: #28a745; /* أخضر للإيداع/النجاح */
-            --danger-color: #dc3545; /* أحمر للمصروف/الخطر */
-            --bg-light: #f8f9fa; /* خلفية فاتحة */
-            --text-dark: #343a40; /* نص داكن */
+            --primary-color: #007bff; 
+            --secondary-color: #6c757d; 
+            --success-color: #28a745; 
+            --danger-color: #dc3545; 
+            --bg-light: #f8f9fa; 
+            --text-dark: #343a40; 
         }
         
         body { 
@@ -105,6 +104,9 @@
         }
         .btn-edit { background-color: #ffc107; color: var(--text-dark); margin-right: 5px; }
         .btn-edit:hover { background-color: #e0a800; }
+        .btn-delete { background-color: var(--danger-color); color: white; margin-right: 5px; }
+        .btn-delete:hover { background-color: #c82333; }
+        .action-cell { white-space: nowrap; }
 
         /* النموذج المنبثق (Modal) */
         .modal {
@@ -157,7 +159,7 @@
 <body>
 
 <div class="container">
-    <h1> يا سعيد سجل ايجاراتك اول بأول </h1>
+    <h1>نظام متابعة إيجارات ومصروفات العقارات (25 شقة)</h1>
 
     <nav id="main-nav">
         <a href="#dashboard" class="active-link" onclick="showTab('dashboard', this)">الرئيسية/الملخص</a>
@@ -179,7 +181,6 @@
 
     <section id="transactions" class="tab-content">
         <h2>إدخال عملية مالية جديدة</h2>
-
         <h3>إدخال إيداع (إيجار) 💰</h3>
         <form id="deposit-form">
             <label for="dep-date">التاريخ:</label>
@@ -197,9 +198,9 @@
             <label for="dep-building">العقار (المبنى):</label>
             <select id="dep-building" onchange="populateUnits()" required>
                 <option value="">-- اختر العقار --</option>
-                <option value="الفيلا والمبنى الرئيسي">الفيلا والمبنى الرئيسي(شقق 1-14)</option>
-                <option value="المجلس 101">المجلس 101 (شقق 1-7)</option>
-                <option value="المجلس 102">المجلس 102 (شقق 1-4)</option>
+                <option value="الفيلا والمبنى الرئيسي">الفيلا والمبنى الرئيسي (شقق 1-14)</option>
+                <option value="المجلس 101">المجلس 101 (شقق 15-21)</option>
+                <option value="المجلس 102">المجلس 102 (شقق 22-25)</option>
             </select><br>
 
             <label for="dep-unit">رقم الشقة/الوحدة:</label>
@@ -312,19 +313,135 @@
 </div>
 
 <script>
-    // 1. تعريف خريطة العقارات والشقق
     const unitsMap = {
         "الفيلا والمبنى الرئيسي": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],    
-        "المجلس 101": [7, 6, 5, 4, 3, 2, 1], 
-        "المجلس 102": [4, 3, 2, 1] 
+        "المجلس 101": [15, 16, 17, 18, 19, 20, 21], 
+        "المجلس 102": [22, 23, 24, 25] 
     };
-
     let transactions = []; 
 
     // ===================================
-    // وظائف دعم النظام الأساسية
+    // وظائف التخزين والحساب
     // ===================================
 
+    function loadTransactions() {
+        const storedTransactions = localStorage.getItem('hesabatTransactions');
+        if (storedTransactions) {
+            transactions = JSON.parse(storedTransactions);
+        }
+        updateSummary();
+    }
+
+    function saveTransactions() {
+        localStorage.setItem('hesabatTransactions', JSON.stringify(transactions));
+    }
+
+    function updateSummary() {
+        let totalDeposits = 0;
+        let totalExpenses = 0;
+        let netIncome = 0;
+
+        transactions.forEach(t => {
+            if (t.amount > 0) {
+                totalDeposits += t.amount;
+            } else {
+                totalExpenses += Math.abs(t.amount); 
+            }
+            netIncome += t.amount;
+        });
+        
+        document.getElementById('total-deposits').textContent = totalDeposits.toFixed(2).toLocaleString('en');
+        document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2).toLocaleString('en');
+        document.getElementById('net-income').textContent = netIncome.toFixed(2).toLocaleString('en');
+        
+        const netIncomeElement = document.getElementById('net-income');
+        const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
+        const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color');
+
+        netIncomeElement.style.color = netIncome >= 0 ? successColor : dangerColor;
+    }
+
+    // ===================================
+    // وظيفة الحذف الجديدة
+    // ===================================
+    function deleteTransaction(id) {
+        const transactionIndex = transactions.findIndex(t => t.id === id);
+
+        if (transactionIndex > -1) {
+            const transactionType = transactions[transactionIndex].type;
+            const confirmation = confirm(`هل أنت متأكد من حذف ${transactionType} بتاريخ ${transactions[transactionIndex].date}؟ لا يمكن التراجع عن هذا الإجراء.`);
+            
+            if (confirmation) {
+                transactions.splice(transactionIndex, 1); // حذف العملية من المصفوفة
+                saveTransactions();
+                updateSummary();
+                renderTransactions();
+                alert('🗑️ تم حذف العملية بنجاح.');
+            }
+        } else {
+            alert('⚠️ لم يتم العثور على العملية المراد حذفها.');
+        }
+    }
+
+
+    // ===================================
+    // عرض كشف الحركة المالية (مُحدث)
+    // ===================================
+
+    function renderTransactions() {
+        const tableBody = document.getElementById('transactions-table-body');
+        tableBody.innerHTML = ''; 
+
+        if (transactions.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">لا توجد حركات مسجلة بعد.</td></tr>';
+            return;
+        }
+
+        const sortedTransactions = [...transactions].sort((a, b) => {
+            if (a.date < b.date) return -1;
+            if (a.date > b.date) return 1;
+            return a.id - b.id; 
+        });
+        
+        let runningBalance = 0;
+        let rowsHtml = [];
+        
+        const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
+        const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color');
+
+        sortedTransactions.forEach(t => {
+            runningBalance += t.amount;
+
+            const depositValue = t.amount > 0 ? t.amount.toFixed(2).toLocaleString('en') : '-';
+            const expenseValue = t.amount < 0 ? Math.abs(t.amount).toFixed(2).toLocaleString('en') : '-';
+            const unitDisplay = t.type === 'إيداع' ? `شقة ${t.unit}` : t.unit;
+            
+            rowsHtml.push(`
+                <tr>
+                    <td>${t.date}</td>
+                    <td>${t.type}</td>
+                    <td>${t.building}</td>
+                    <td>${unitDisplay} / ${t.description}</td>
+                    <td>${t.paymentMethod || '-'}</td>
+                    <td class="${t.amount > 0 ? 'deposit' : ''}">${depositValue}</td>
+                    <td class="${t.amount < 0 ? 'expense' : ''}">${expenseValue}</td>
+                    <td style="font-weight: bold; color: ${runningBalance >= 0 ? successColor : dangerColor};">${runningBalance.toFixed(2).toLocaleString('en')}</td>
+                    <td class="action-cell">
+                        <button class="btn-edit" onclick="openModal(${t.id})">تعديل</button>
+                        <button class="btn-delete" onclick="deleteTransaction(${t.id})">حذف</button>
+                    </td>
+                </tr>
+            `);
+        });
+        
+        // عكس ترتيب الصفوف المعروضة ليكون الأحدث هو الأعلى
+        tableBody.innerHTML = rowsHtml.reverse().join('');
+    }
+    
+    // ===================================
+    // وظائف دعم النظام الأساسية
+    // ===================================
+    
     function showTab(tabId, element) {
         document.querySelectorAll('.tab-content').forEach(tab => {
             tab.classList.remove('active');
@@ -370,52 +487,9 @@
     }
     
     // ===================================
-    // وظائف التخزين والحساب
-    // ===================================
-
-    function loadTransactions() {
-        const storedTransactions = localStorage.getItem('hesabatTransactions');
-        if (storedTransactions) {
-            transactions = JSON.parse(storedTransactions);
-        }
-        updateSummary();
-    }
-
-    function saveTransactions() {
-        localStorage.setItem('hesabatTransactions', JSON.stringify(transactions));
-    }
-
-    function updateSummary() {
-        let totalDeposits = 0;
-        let totalExpenses = 0;
-        let netIncome = 0;
-
-        transactions.forEach(t => {
-            if (t.amount > 0) {
-                totalDeposits += t.amount;
-            } else {
-                totalExpenses += Math.abs(t.amount); 
-            }
-            netIncome += t.amount;
-        });
-        
-        document.getElementById('total-deposits').textContent = totalDeposits.toFixed(2).toLocaleString('en');
-        document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2).toLocaleString('en');
-        document.getElementById('net-income').textContent = netIncome.toFixed(2).toLocaleString('en');
-        
-        const netIncomeElement = document.getElementById('net-income');
-        // استخدام getComputedStyle للوصول لمتغيرات CSS
-        const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
-        const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color');
-
-        netIncomeElement.style.color = netIncome >= 0 ? successColor : dangerColor;
-    }
-
-    // ===================================
     // معالجة النماذج
     // ===================================
 
-    // معالجة إدخال الإيداع
     document.getElementById('deposit-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -438,7 +512,6 @@
         document.getElementById('dep-unit').disabled = true; 
     });
 
-    // معالجة إدخال المصروف
     document.getElementById('expense-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -460,6 +533,7 @@
         alert('✅ تم تسجيل المصروف بنجاح!');
     });
 
+
     // ===================================
     // وظائف التعديل (Editing)
     // ===================================
@@ -468,7 +542,6 @@
         const transaction = transactions.find(t => t.id === id);
         if (!transaction) return;
 
-        // تعبئة النموذج المنبثق
         document.getElementById('edit-id').value = id;
         document.getElementById('edit-date').value = transaction.date;
         document.getElementById('edit-amount').value = transaction.amount; 
@@ -494,18 +567,15 @@
         if (transactionIndex > -1) {
             const originalType = transactions[transactionIndex].type;
             
-            // تحديث البيانات
             transactions[transactionIndex].date = newDate;
             transactions[transactionIndex].amount = newAmount; 
             transactions[transactionIndex].description = newDesc;
             
-            // تحديث نوع العملية إذا تغيرت الإشارة
             if (originalType === 'إيداع' && newAmount < 0) {
                  transactions[transactionIndex].type = 'مصروف';
                  transactions[transactionIndex].building = 'مصروفات';
             } else if (originalType === 'مصروف' && newAmount > 0) {
                  transactions[transactionIndex].type = 'إيداع';
-                 // إذا كان التعديل من مصروف إلى إيداع، يجب مراجعة المبنى والوحدة يدويا!
                  transactions[transactionIndex].building = 'تحتاج مراجعة (إيداع)'; 
             }
 
@@ -519,68 +589,13 @@
         }
     });
 
-    // إغلاق المودال عند الضغط خارجها
     window.onclick = function(event) {
         const modal = document.getElementById('editModal');
         if (event.target == modal) {
             closeModal();
         }
     }
-
-
-    // ===================================
-    // عرض كشف الحركة المالية (مصمم للتحديث)
-    // ===================================
-
-    function renderTransactions() {
-        const tableBody = document.getElementById('transactions-table-body');
-        tableBody.innerHTML = ''; 
-
-        if (transactions.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">لا توجد حركات مسجلة بعد.</td></tr>';
-            return;
-        }
-
-        // 1. فرز حسب التاريخ (الأقدم أولاً) لحساب الرصيد المتراكم بشكل صحيح
-        const sortedTransactions = [...transactions].sort((a, b) => {
-            if (a.date < b.date) return -1;
-            if (a.date > b.date) return 1;
-            return a.id - b.id; 
-        });
-        
-        let runningBalance = 0;
-        let rowsHtml = [];
-        
-        // 2. حساب الرصيد المتراكم وإنشاء صفوف الجدول
-        const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
-        const dangerColor = getComputedStyle(document.documentElement).getPropertyValue('--danger-color');
-
-        sortedTransactions.forEach(t => {
-            runningBalance += t.amount;
-
-            const depositValue = t.amount > 0 ? t.amount.toFixed(2).toLocaleString('en') : '-';
-            const expenseValue = t.amount < 0 ? Math.abs(t.amount).toFixed(2).toLocaleString('en') : '-';
-            const unitDisplay = t.type === 'إيداع' ? `شقة ${t.unit}` : t.unit;
-            
-            rowsHtml.push(`
-                <tr>
-                    <td>${t.date}</td>
-                    <td>${t.type}</td>
-                    <td>${t.building}</td>
-                    <td>${unitDisplay} / ${t.description}</td>
-                    <td>${t.paymentMethod || '-'}</td>
-                    <td class="${t.amount > 0 ? 'deposit' : ''}">${depositValue}</td>
-                    <td class="${t.amount < 0 ? 'expense' : ''}">${expenseValue}</td>
-                    <td style="font-weight: bold; color: ${runningBalance >= 0 ? successColor : dangerColor};">${runningBalance.toFixed(2).toLocaleString('en')}</td>
-                    <td><button class="btn-edit" onclick="openModal(${t.id})">تعديل</button></td>
-                </tr>
-            `);
-        });
-        
-        // 3. عكس ترتيب الصفوف المعروضة ليكون الأحدث هو الأعلى
-        tableBody.innerHTML = rowsHtml.reverse().join('');
-    }
-
+    
     // ===================================
     // وظائف التقارير (كما هي)
     // ===================================
@@ -723,4 +738,3 @@
 
 </body>
 </html>
-
