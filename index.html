@@ -157,7 +157,7 @@
 <body>
 
 <div class="container">
-    <h1>نظام متابعة إيجارات ومصروفات العقارات (25 شقة)</h1>
+    <h1> يا سعيد سجل ايجاراتك اول بأول </h1>
 
     <nav id="main-nav">
         <a href="#dashboard" class="active-link" onclick="showTab('dashboard', this)">الرئيسية/الملخص</a>
@@ -197,9 +197,9 @@
             <label for="dep-building">العقار (المبنى):</label>
             <select id="dep-building" onchange="populateUnits()" required>
                 <option value="">-- اختر العقار --</option>
-                <option value="الفيلا والمبنى الرئيسي">الفيلا والمبنى الرئيسي (شقق 1-14)</option>
-                <option value="المجلس 101">المجلس 101 (شقق 15-21)</option>
-                <option value="المجلس 102">المجلس 102 (شقق 22-25)</option>
+                <option value="الفيلا والمبنى الرئيسي">الفيلا والمبنى الرئيسي(شقق 1-14)</option>
+                <option value="المجلس 101">المجلس 101 (شقق 1-7)</option>
+                <option value="المجلس 102">المجلس 102 (شقق 1-4)</option>
             </select><br>
 
             <label for="dep-unit">رقم الشقة/الوحدة:</label>
@@ -315,8 +315,8 @@
     // 1. تعريف خريطة العقارات والشقق
     const unitsMap = {
         "الفيلا والمبنى الرئيسي": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],    
-        "المجلس 101": [15, 16, 17, 18, 19, 20, 21], 
-        "المجلس 102": [22, 23, 24, 25] 
+        "المجلس 101": [7, 6, 5, 4, 3, 2, 1], 
+        "المجلس 102": [4, 3, 2, 1] 
     };
 
     let transactions = []; 
@@ -723,3 +723,4 @@
 
 </body>
 </html>
+
