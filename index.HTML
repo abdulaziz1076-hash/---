@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة العقارات والحسابات - النسخة الاحترافية</title>
+    
+    <style>
+        /* ==================================== */
+        /* CSS للتنسيق والمظهر العام */
+        /* ==================================== */
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1, h2, h3 { 
+            color: #007bff; 
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        nav {
+            background-color: #007bff;
+            padding: 10px 0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        nav a { 
+            margin: 0 15px; 
+            text-decoration: none; 
+            color: white; 
+            font-weight: bold;
+            padding: 5px 10px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover, nav a.active-link {
+            background-color: #0056b3;
+            border-radius: 5px;
+        }
+
+        /* الجداول والتقارير */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px; 
+            text-align: right; 
+        }
+        th { 
+            background-color: #e9ecef; 
+            color: #333;
+            font-weight: bold;
+        }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        .deposit { color: green; font-weight: bold; }
+        .expense { color: red; font-weight: bold; }
+        .tab-content { display: none; padding-top: 20px; }
+        .active { display: block; }
+
+        /* الملخص */
+        #summary-data { display: flex; justify-content: space-between; gap: 20px; }
+        #summary-data p {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            flex-grow: 1;
+            border-right: 5px solid #007bff;
+        }
+
+        /* حقول الإدخال */
+        form label {
+            display: inline-block;
+            width: 150px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        form input, form select {
+            width: 70%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        form button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .report-controls {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .report-controls button {
+             background-color: #17a2b8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>نظام متابعة إيجارات ومصروفات العقارات (25 شقة)</h1>
+
+    <nav id="main-nav">
+        <a href="#dashboard" class="active-link" onclick="showTab('dashboard', this)">الرئيسية/الملخص</a>
+        <a href="#transactions" onclick="showTab('transactions', this)">إدخال العمليات</a>
+        <a href="#statements" onclick="showTab('statements', this)">كشوفات الحركة</a>
+        <a href="#reports" onclick="showTab('reports', this)">التقارير الاحترافية</a>
+    </nav>
+
+    <section id="dashboard" class="tab-content active">
+        <h2>ملخص الأداء المالي</h2>
+        <div id="summary-data">
+            <p><strong>إجمالي الإيرادات:</strong> <span id="total-deposits">0.00</span> ريال</p>
+            <p><strong>إجمالي المصروفات:</strong> <span id="total-expenses">0.00</span> ريال</p>
+            <p><strong>صافي الدخل (الرصيد):</strong> <span id="net-income">0.00</span> ريال</p>
+        </div>
+        <h3 style="margin-top: 40px;">ملاحظات هامة</h3>
+        <p>🔴 **تذكير:** البيانات مخزنة محلياً في متصفحك. استخدم نفس المتصفح والجهاز لتجنب ضياعها. 
+            للتخزين السحابي، يجب استخدام قاعدة بيانات مثل Firebase.</p>
+    </section>
+
+    <section id="transactions" class="tab-content">
+        <h2>إدخال عملية مالية جديدة</h2>
+
+        <h3>إدخال إيداع (إيجار) 💰</h3>
+        <form id="deposit-form">
+            <label for="dep-date">التاريخ:</label>
+            <input type="date" id="dep-date" required><br>
+
+            <label for="dep-amount">المبلغ المدفوع:</label>
+            <input type="number" id="dep-amount" min="1" required><br>
+            
+            <label for="dep-payment-method">طريقة الدفع:</label>
+            <select id="dep-payment-method" required>
+                <option value="نقدي">نقدي (Cash)</option>
+                <option value="بنكي">تحويل بنكي (Bank Transfer)</option>
+            </select><br>
+
+            <label for="dep-building">العقار (المبنى):</label>
+            <select id="dep-building" onchange="populateUnits()" required>
+                <option value="">-- اختر العقار --</option>
+                <option value="الفيلا والمبنى الرئيسي">الفيلا والمبنى الرئيسي (شقق 1-14)</option>
+                <option value="المجلس 101">المجلس 101 (شقق 15-21)</option>
+                <option value="المجلس 102">المجلس 102 (شقق 22-25)</option>
+            </select><br>
+
+            <label for="dep-unit">رقم الشقة/الوحدة:</label>
+            <select id="dep-unit" required disabled>
+                <option value="">-- اختر شقة --</option>
+            </select><br>
+
+            <label for="dep-desc">ملاحظات/الشهر:</label>
+            <input type="text" id="dep-desc" placeholder="مثال: إيجار شهر أكتوبر 2025"><br>
+
+            <button type="submit">تسجيل الإيداع</button>
+        </form>
+
+        <hr style="margin: 30px 0;">
+
+        <h3>إدخال مصروف 💸</h3>
+        <form id="expense-form">
+            <label for="exp-date">التاريخ:</label>
+            <input type="date" id="exp-date" required><br>
+
+            <label for="exp-amount">المبلغ:</label>
+            <input type="number" id="exp-amount" min="1" required><br>
+
+            <label for="exp-type">نوع المصروف:</label>
+            <select id="exp-type" required>
+                <option value="صيانة">صيانة</option>
+                <option value="فواتير">فواتير (كهرباء/ماء)</option>
+                <option value="أجور">أجور حارس/إدارة</option>
+                <option value="أخرى">أخرى</option>
+            </select><br>
+
+            <label for="exp-desc">الوصف:</label>
+            <input type="text" id="exp-desc" required placeholder="مثال: فاتورة كهرباء الفيلا"><br>
+
+            <button type="submit">تسجيل المصروف</button>
+        </form>
+    </section>
+
+    <section id="statements" class="tab-content">
+        <h2>كشف الحركة المالية التفصيلي</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>التاريخ</th>
+                    <th>النوع</th>
+                    <th>المبنى</th>
+                    <th>الوحدة/التصنيف</th>
+                    <th>طريقة الدفع</th>
+                    <th>الإيداع (+)</th>
+                    <th>المصروف (-)</th>
+                    <th>الرصيد</th>
+                </tr>
+            </thead>
+            <tbody id="transactions-table-body">
+                <tr><td colspan="8" style="text-align: center;">لا توجد حركات مسجلة بعد.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="reports" class="tab-content">
+        <h2>التقارير الاحترافية</h2>
+        
+        <div class="report-controls">
+            <label for="report-type">نوع التقرير:</label>
+            <select id="report-type" onchange="toggleReportFilters()">
+                <option value="annual">تقرير سنوي/شهري إجمالي</option>
+                <option value="building">تقرير حسب العقار</option>
+            </select>
+            
+            <div id="filter-building" style="margin-top: 15px; display: none;">
+                <label for="report-building-select">اختيار العقار:</label>
+                <select id="report-building-select">
+                    <option value="الكل">الكل</option>
+                    <option value="الفيلا والمبنى الرئيسي">الفيلا والمبنى الرئيسي</option>
+                    <option value="المجلس 101">المجلس 101</option>
+                    <option value="المجلس 102">المجلس 102</option>
+                </select>
+            </div>
+            
+            <button onclick="generateReport()" style="margin-right: 20px;">توليد التقرير</button>
+            <button onclick="printReport()" style="background-color: #6c757d;">طباعة التقرير</button>
+        </div>
+
+        <h3 id="report-title">نتائج التقرير</h3>
+        <div id="report-output">
+            <p style="color: #6c757d;">اختر نوع التقرير واضغط "توليد التقرير" لعرض البيانات.</p>
+        </div>
+    </section>
+
+</div> <script>
+    // 1. تعريف خريطة العقارات والشقق (بناءً على التعديل الجديد)
+    const unitsMap = {
+        // شقق 1-6 (المبنى الرئيسي) + شقق 7-14 (الفيلا) = 14 شقة
+        "الفيلا والمبنى الرئيسي": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],    
+        "المجلس 101": [15, 16, 17, 18, 19, 20, 21], // 7 شقق
+        "المجلس 102": [22, 23, 24, 25] // 4 شقق
+    };
+
+    let transactions = []; 
+
+    // 2. وظيفة التبديل بين الأقسام
+    function showTab(tabId, element) {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+
+        document.querySelectorAll('nav a').forEach(a => {
+            a.classList.remove('active-link');
+        });
+        element.classList.add('active-link');
+        
+        if (tabId === 'statements') {
+            renderTransactions(); 
+        }
+        if (tabId === 'dashboard') {
+            updateSummary(); 
+        }
+        if (tabId === 'reports') {
+            toggleReportFilters();
+        }
+    }
+
+    // 3. وظيفة تعبئة قائمة الشقق بناءً على اختيار العقار
+    function populateUnits() {
+        const buildingSelect = document.getElementById('dep-building');
+        const unitSelect = document.getElementById('dep-unit');
+        const selectedBuilding = buildingSelect.value;
+
+        unitSelect.innerHTML = '<option value="">-- اختر شقة --</option>';
+
+        if (selectedBuilding && unitsMap[selectedBuilding]) {
+            unitSelect.disabled = false;
+            const units = unitsMap[selectedBuilding];
+
+            units.forEach(unitNumber => {
+                const option = document.createElement('option');
+                option.value = unitNumber;
+                option.textContent = `شقة رقم ${unitNumber}`;
+                unitSelect.appendChild(option);
+            });
+        } else {
+            unitSelect.disabled = true;
+        }
+    }
+
+    // 4. تحميل البيانات وحفظها (Local Storage)
+    function loadTransactions() {
+        const storedTransactions = localStorage.getItem('hesabatTransactions');
+        if (storedTransactions) {
+            transactions = JSON.parse(storedTransactions);
+        }
+        updateSummary();
+        renderTransactions(); 
+    }
+
+    function saveTransactions() {
+        localStorage.setItem('hesabatTransactions', JSON.stringify(transactions));
+    }
+
+    // 5. معالجة إدخال الإيداع (مع إضافة طريقة الدفع)
+    document.getElementById('deposit-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const newTransaction = {
+            date: document.getElementById('dep-date').value,
+            type: 'إيداع',
+            amount: parseFloat(document.getElementById('dep-amount').value),
+            paymentMethod: document.getElementById('dep-payment-method').value, // جديد
+            building: document.getElementById('dep-building').value,
+            unit: document.getElementById('dep-unit').value,
+            description: document.getElementById('dep-desc').value || 'إيجار مدفوع',
+        };
+
+        transactions.push(newTransaction);
+        saveTransactions();
+        updateSummary();
+        renderTransactions();
+        this.reset();
+        alert('✅ تم تسجيل الإيداع بنجاح!');
+        document.getElementById('dep-unit').disabled = true;
+    });
+
+    // 6. معالجة إدخال المصروف
+    document.getElementById('expense-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const newTransaction = {
+            date: document.getElementById('exp-date').value,
+            type: 'مصروف',
+            amount: parseFloat(document.getElementById('exp-amount').value) * -1, 
+            paymentMethod: 'نقدي/غير محدد', // يمكن تعديلها إذا أردت تتبع طريقة دفع المصروفات
+            building: 'غير محدد',
+            unit: document.getElementById('exp-type').value, 
+            description: document.getElementById('exp-desc').value,
+        };
+
+        transactions.push(newTransaction);
+        saveTransactions();
+        updateSummary();
+        renderTransactions();
+        this.reset();
+        alert('✅ تم تسجيل المصروف بنجاح!');
+    });
+
+    // 7. تحديث ملخص الأداء المالي
+    function updateSummary() {
+        let totalDeposits = 0;
+        let totalExpenses = 0;
+        let netIncome = 0;
+
+        transactions.forEach(t => {
+            if (t.amount > 0) {
+                totalDeposits += t.amount;
+            } else {
+                totalExpenses += Math.abs(t.amount); 
+            }
+            netIncome += t.amount;
+        });
+
+        document.getElementById('total-deposits').textContent = totalDeposits.toFixed(2).toLocaleString('en');
+        document.getElementById('total-expenses').textContent = totalExpenses.toFixed(2).toLocaleString('en');
+        document.getElementById('net-income').textContent = netIncome.toFixed(2).toLocaleString('en');
+        
+        const netIncomeElement = document.getElementById('net-income');
+        netIncomeElement.style.color = netIncome >= 0 ? 'green' : 'red';
+    }
+
+
+    // 8. عرض كشف الحركة المالية التفصيلي (مع إضافة عمود طريقة الدفع)
+    function renderTransactions() {
+        const tableBody = document.getElementById('transactions-table-body');
+        tableBody.innerHTML = ''; 
+
+        if (transactions.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">لا توجد حركات مسجلة بعد.</td></tr>';
+            return;
+        }
+
+        const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        let runningBalance = 0;
+
+        // عكس الترتيب للعرض (الأحدث أولاً)
+        for (let i = sortedTransactions.length - 1; i >= 0; i--) {
+            const t = sortedTransactions[i];
+            
+            // نحتاج لحساب الرصيد بترتيب تاريخي صحيح
+            let tempRunningBalance = 0;
+            for(let j=0; j<=i; j++) {
+                tempRunningBalance += sortedTransactions[j].amount;
+            }
+            runningBalance = tempRunningBalance;
+
+            const row = tableBody.insertRow(0); // إدراج الصف في البداية ليكون الأحدث هو الأعلى
+            
+            const depositValue = t.amount > 0 ? t.amount.toFixed(2).toLocaleString('en') : '-';
+            const expenseValue = t.amount < 0 ? Math.abs(t.amount).toFixed(2).toLocaleString('en') : '-';
+            const unitDisplay = t.type === 'إيداع' ? `شقة ${t.unit}` : t.unit;
+
+            row.innerHTML = `
+                <td>${t.date}</td>
+                <td>${t.type}</td>
+                <td>${t.building}</td>
+                <td>${unitDisplay} / ${t.description}</td>
+                <td>${t.paymentMethod || '-'}</td>
+                <td class="${t.amount > 0 ? 'deposit' : ''}">${depositValue}</td>
+                <td class="${t.amount < 0 ? 'expense' : ''}">${expenseValue}</td>
+                <td>${runningBalance.toFixed(2).toLocaleString('en')}</td>
+            `;
+        }
+    }
+
+    // 9. وظائف التقارير الاحترافية الجديدة
+    function toggleReportFilters() {
+        const type = document.getElementById('report-type').value;
+        document.getElementById('filter-building').style.display = type === 'building' ? 'block' : 'none';
+    }
+
+    function generateReport() {
+        const reportType = document.getElementById('report-type').value;
+        const output = document.getElementById('report-output');
+        const title = document.getElementById('report-title');
+        output.innerHTML = '';
+        
+        if (transactions.length === 0) {
+            output.innerHTML = '<p style="color: red;">لا توجد بيانات لتوليد التقرير.</p>';
+            return;
+        }
+
+        if (reportType === 'annual') {
+            title.textContent = 'تقرير الأداء الإجمالي السنوي/الشهري';
+            output.innerHTML = generateAnnualReport();
+        } else if (reportType === 'building') {
+            const selectedBuilding = document.getElementById('report-building-select').value;
+            title.textContent = `تقرير أداء العقار: ${selectedBuilding}`;
+            output.innerHTML = generateBuildingReport(selectedBuilding);
+        }
+    }
+
+    function generateAnnualReport() {
+        const monthlyData = {};
+        transactions.forEach(t => {
+            const monthYear = t.date.substring(0, 7); // YYYY-MM
+            if (!monthlyData[monthYear]) {
+                monthlyData[monthYear] = { deposits: 0, expenses: 0, net: 0 };
+            }
+            if (t.amount > 0) {
+                monthlyData[monthYear].deposits += t.amount;
+            } else {
+                monthlyData[monthYear].expenses += Math.abs(t.amount);
+            }
+            monthlyData[monthYear].net += t.amount;
+        });
+
+        let html = '<table><thead><tr><th>الشهر/السنة</th><th>الإيرادات</th><th>المصروفات</th><th>صافي الدخل</th></tr></thead><tbody>';
+        
+        // فرز حسب التاريخ
+        const sortedMonths = Object.keys(monthlyData).sort();
+
+        sortedMonths.forEach(month => {
+            const data = monthlyData[month];
+            html += `
+                <tr>
+                    <td>${month}</td>
+                    <td>${data.deposits.toFixed(2).toLocaleString('en')}</td>
+                    <td>${data.expenses.toFixed(2).toLocaleString('en')}</td>
+                    <td style="color: ${data.net >= 0 ? 'green' : 'red'}; font-weight: bold;">${data.net.toFixed(2).toLocaleString('en')}</td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        return html;
+    }
+
+    function generateBuildingReport(building) {
+        let filteredTransactions = transactions;
+        if (building !== 'الكل') {
+            filteredTransactions = transactions.filter(t => t.building === building);
+        }
+        
+        let totalDeposits = 0;
+        let totalExpenses = 0;
+
+        filteredTransactions.forEach(t => {
+            if (t.amount > 0) totalDeposits += t.amount;
+            else totalExpenses += Math.abs(t.amount);
+        });
+
+        let html = `
+            <p><strong>الإجمالي الكلي:</strong> ${totalDeposits - totalExpenses.toFixed(2).toLocaleString('en')} ريال</p>
+            <p style="color: green;">إجمالي الإيداعات: ${totalDeposits.toFixed(2).toLocaleString('en')} ريال</p>
+            <p style="color: red;">إجمالي المصروفات: ${totalExpenses.toFixed(2).toLocaleString('en')} ريال</p>
+        `;
+
+        if (building !== 'الكل') {
+            const unitPerformance = {};
+            filteredTransactions.filter(t => t.type === 'إيداع').forEach(t => {
+                const unitKey = t.unit;
+                if (!unitPerformance[unitKey]) {
+                    unitPerformance[unitKey] = 0;
+                }
+                unitPerformance[unitKey] += t.amount;
+            });
+
+            html += '<h3>أداء الوحدات (الشقق)</h3>';
+            html += '<table><thead><tr><th>الشقة</th><th>إجمالي الإيرادات</th></tr></thead><tbody>';
+            
+            Object.keys(unitPerformance).sort((a, b) => a - b).forEach(unit => {
+                html += `
+                    <tr>
+                        <td>شقة رقم ${unit}</td>
+                        <td>${unitPerformance[unit].toFixed(2).toLocaleString('en')}</td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+        }
+        
+        return html;
+    }
+    
+    // 10. وظيفة الطباعة
+    function printReport() {
+        const reportContent = document.getElementById('report-output').innerHTML;
+        const title = document.getElementById('report-title').textContent;
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>' + title + '</title>');
+        printWindow.document.write('<style>body { font-family: Arial, sans-serif; direction: rtl; text-align: right; } table { width: 100%; border-collapse: collapse; margin-top: 20px; } th, td { border: 1px solid #000; padding: 8px; text-align: right; } th { background-color: #f2f2f2; } </style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write('<h1>' + title + '</h1>');
+        printWindow.document.write(reportContent);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+    }
+
+
+    // 11. تشغيل عند تحميل الصفحة
+    window.onload = function() {
+        loadTransactions();
+        showTab('dashboard', document.querySelector('nav a:first-child')); 
+    };
+</script>
+
+</body>
+</html>
